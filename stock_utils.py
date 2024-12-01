@@ -18,8 +18,17 @@ def get_ccl_history(start_date):
 
 def get_stock_data(ticker, ccl, start_date):
     try:
-        stock = yf.Ticker(f"{ticker}.BA").history(start=start_date)["Close"]
+        stock_info = yf.Ticker(f"{ticker}.BA")
+        stock = stock_info.history(start=start_date)["Close"]
         stock.index = stock.index.normalize().date
+
+        # Get book value ratio
+        try:
+            book_value = stock_info.info.get("bookValue", None)
+            current_price = stock.iloc[-1]
+            price_book_ratio = current_price / book_value if book_value else None
+        except:
+            price_book_ratio = None
 
         # Align dates with CCL
         data = pd.DataFrame({"price": stock, "ccl": ccl}).dropna()
@@ -43,6 +52,7 @@ def get_stock_data(ticker, ccl, start_date):
                 ),
                 2,
             ),
+            "p/b": round(float(price_book_ratio), 2) if price_book_ratio else None,
         }
     except Exception as e:
         print(f"Error processing {ticker}: {e}")
