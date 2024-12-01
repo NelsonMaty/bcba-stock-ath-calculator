@@ -5,14 +5,15 @@ def format_tables(df):
     df["upside"] = df.apply(
         lambda row: ((row["ath_usd"] / row["current_price_usd"]) - 1) * 100, axis=1
     )
-    results = df.sort_values("upside", ascending=False)
 
-    main_table = results[["ticker", "current_price_usd", "ath_usd", "upside"]].copy()
-    main_table.columns = ["Ticker", "Current USD", "ATH USD", "Upside %"]
-    print("\n📈 Stocks by Upside Potential")
+    # Panel Líder table
+    lider = df[df["panel"] == "Líder"].sort_values("upside", ascending=False)
+    lider_table = lider[["ticker", "current_price_usd", "ath_usd", "upside"]].copy()
+    lider_table.columns = ["Ticker", "Current USD", "ATH USD", "Upside %"]
+    print("\n📈 Panel Líder")
     print(
         tabulate(
-            main_table,
+            lider_table,
             headers="keys",
             tablefmt="presto",
             floatfmt=(".0f", ".2f", ".2f", ".2f"),
@@ -20,6 +21,22 @@ def format_tables(df):
         )
     )
 
+    # Panel General table
+    general = df[df["panel"] == "General"].sort_values("upside", ascending=False)
+    general_table = general[["ticker", "current_price_usd", "ath_usd", "upside"]].copy()
+    general_table.columns = ["Ticker", "Current USD", "ATH USD", "Upside %"]
+    print("\n📊 Panel General")
+    print(
+        tabulate(
+            general_table,
+            headers="keys",
+            tablefmt="presto",
+            floatfmt=(".0f", ".2f", ".2f", ".2f"),
+            showindex=False,
+        )
+    )
+
+    # Sector leaders
     sector_max = df.loc[df.groupby("sector")["upside"].idxmax()]
     sector_max = sector_max.sort_values("upside", ascending=False)
     sector_table = sector_max[["sector", "ticker", "upside"]].copy()
