@@ -1,57 +1,45 @@
 from tabulate import tabulate
 
 
-def format_tables(df):
-    df["upside"] = df.apply(
-        lambda row: ((row["ath_usd"] / row["current_price_usd"]) - 1) * 100, axis=1
-    )
-
-    # Panel Líder table
-    lider = df[df["panel"] == "Líder"].sort_values("upside", ascending=False)
-    lider_table = lider[
-        ["ticker", "current_price_usd", "ath_usd", "upside", "p/b"]
-    ].copy()
-    lider_table.columns = ["Ticker", "Current USD", "ATH USD", "Upside %", "P/B"]
-    print("\n📈 Panel Líder")
-    print(
-        tabulate(
-            lider_table,
-            headers="keys",
-            tablefmt="presto",
-            floatfmt=(".0f", ".2f", ".2f", ".2f", ".2f"),
-            showindex=False,
+def format_table(df, sort_by="upside"):
+    # Calculate upside if not already present
+    if "upside" not in df.columns:
+        df["upside"] = df.apply(
+            lambda row: ((row["ath_usd"] / row["current_price_usd"]) - 1) * 100, axis=1
         )
-    )
 
-    # Panel General table
-    general = df[df["panel"] == "General"].sort_values("upside", ascending=False)
-    general_table = general[
-        ["ticker", "current_price_usd", "ath_usd", "upside", "p/b"]
+    # Sort based on argument
+    sort_column = {"ticker": "ticker", "upside": "upside", "pb": "p/b"}.get(sort_by)
+
+    # Define ascending based on sort type
+    ascending = {
+        "ticker": True,
+        "upside": False,
+        "pb": True,  # Changed to True to show lowest P/B first
+    }.get(sort_by)
+
+    df_sorted = df.sort_values(sort_column, ascending=ascending)
+
+    # Prepare table data
+    table_data = df_sorted[
+        ["ticker", "panel", "current_price_usd", "ath_usd", "upside", "p/b"]
     ].copy()
-    general_table.columns = ["Ticker", "Current USD", "ATH USD", "Upside %", "P/B"]
-    print("\n📊 Panel General")
-    print(
-        tabulate(
-            general_table,
-            headers="keys",
-            tablefmt="presto",
-            floatfmt=(".0f", ".2f", ".2f", ".2f", ".2f"),
-            showindex=False,
-        )
-    )
+    table_data.columns = [
+        "Ticker",
+        "Panel",
+        "Current USD",
+        "ATH USD",
+        "Upside %",
+        "P/B",
+    ]
 
-    # Sector leaders
-    sector_max = df.loc[df.groupby("sector")["upside"].idxmax()]
-    sector_max = sector_max.sort_values("upside", ascending=False)
-    sector_table = sector_max[["sector", "ticker", "upside", "p/b"]].copy()
-    sector_table.columns = ["Sector", "Ticker", "Upside %", "P/B"]
-    print("\n🏆 Sector Leaders")
+    print(f"\n📈 BCBA Stocks Analysis (sorted by {sort_by})")
     print(
         tabulate(
-            sector_table,
+            table_data,
             headers="keys",
             tablefmt="presto",
-            floatfmt=(".0f", ".0f", ".2f", ".2f"),
+            floatfmt=(".0f", ".0f", ".2f", ".2f", ".2f", ".2f"),
             showindex=False,
         )
     )
