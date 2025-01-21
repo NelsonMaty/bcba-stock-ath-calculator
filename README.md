@@ -7,26 +7,20 @@ Calculates key metrics for BCBA (Buenos Aires Stock Exchange) stocks, including:
 - Upside potential to ATH
 - Price to Book ratio
 
-## Installation
+## Installation & Usage
+
+1. Clone this repository to your local machine.
+2. Run the following script to automatically set up the environment and run the program:
 
 ```bash
-pip install -r requirements.txt
+./run.sh
 ```
-
-## Usage
-
-Basic usage (sorts by upside potential by default):
+## Sort options
 
 ```bash
-python main.py
-```
-
-Sort options:
-
-```bash
-python main.py --sort ticker  # Sort alphabetically by ticker
-python main.py --sort upside  # Sort by upside potential to ATH
-python main.py --sort pb      # Sort by Price/Book ratio
+./run.sh --sort ticker  # Sort alphabetically by ticker
+./run --sort upside  # Sort by upside potential to ATH
+./run --sort pb      # Sort by Price/Book ratio
 ```
 
 ## Features
