@@ -19,3 +19,7 @@ fi
 # Pass any arguments (flags) received by the script to main.py
 echo "Running main.py with the provided arguments..."
 python main.py "$@"
+
+# Deactivate the virtual environment
+deactivate
+echo "Virtual environment deactivated."
